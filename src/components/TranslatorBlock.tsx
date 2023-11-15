@@ -1,27 +1,20 @@
 import React, { Dispatch, SetStateAction } from 'react';
 
 type Props = {
-  inputText: string;
-  setInputText: Dispatch<SetStateAction<string>>;
-  onClick: () => {};
+  title: string;
+  text: string;
+  isLoading: boolean;
 };
 
 export default function TranslatorBlock({
-  inputText,
-  setInputText,
-  onClick,
+  title,
+  text = 'null',
+  isLoading,
 }: Props) {
   return (
-    <section className='flex flex-col max-w-sm'>
-      <h3 className='font-semibold text-cyan-800'>English</h3>
-      <textarea
-        className='border'
-        value={inputText}
-        onChange={(e) => setInputText(e.target.value)}
-      />
-      <button className='border bg-red-400 text-white' onClick={onClick}>
-        번역하기
-      </button>
+    <section className='flex flex-col max-w-sm p-5 bg-yellow-50'>
+      <h3 className='font-semibold text-sky-500'>{title}</h3>
+      <p className='border'>{isLoading ? '로딩중...' : text}</p>
     </section>
   );
 }

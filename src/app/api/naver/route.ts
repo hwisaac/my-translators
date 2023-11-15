@@ -3,13 +3,14 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   const { sourceText } = await request.json();
-  if (!sourceText) return new Error('sourceText 가 비었습니다.');
-  const res = await axios
+  if (!sourceText) throw new Error('sourceText 가 비었습니다.');
+  console.log(`요청받음🤔 [papago] ${sourceText}`);
+  const response = await axios
     .post(
       'https://openapi.naver.com/v1/papago/n2mt',
       {
-        source: 'ko',
-        target: 'en',
+        source: 'en',
+        target: 'ko',
         text: sourceText,
       },
       {
@@ -20,9 +21,14 @@ export async function POST(request: Request) {
         },
       }
     )
-    .then((res) => res.data.message.result.translatedText);
-  // console.log(res);
-  return new Response(res, {
-    status: 200,
-  });
+    .then((res) => res.data);
+
+  return new Response(
+    JSON.stringify({
+      text: response.message.result.translatedText,
+    }),
+    {
+      status: 200,
+    }
+  );
 }
