@@ -80,3 +80,15 @@ export const useMtGpt40 = (sourceText: string) => {
     enabled: false,
   });
 };
+
+export const useMtKeti = (sourceText: string) => {
+  return useQuery({
+    queryKey: ['mtKeti-0'],
+    queryFn: () =>
+      axios.post('/api/keti', {
+        sourceText,
+      }),
+    select: (res) => res.data,
+    enabled: false,
+  });
+};
