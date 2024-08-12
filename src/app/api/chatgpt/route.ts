@@ -41,7 +41,7 @@ export async function POST(request: Request) {
               content: `${sourceText}`,
             },
           ],
-          temperature: 0.7,
+          temperature: 1,
         },
         {
           headers: {

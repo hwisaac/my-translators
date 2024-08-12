@@ -2,8 +2,10 @@
 import TranslatorBlock from '@/components/TranslatorBlock';
 import {
   useMtDeepl,
+  useMtGoogle,
   useMtGpt35_1106,
   useMtGpt40,
+  useMtGpt4o,
   useMtKeti,
   useMtPapago,
 } from '@/queries';
@@ -16,6 +18,8 @@ interface ITurnOn {
   mtGpt35: boolean;
   mtGpt40: boolean;
   mtKeti0: boolean;
+  mtGpt4o: boolean;
+  mtGoogle: boolean;
 }
 
 interface IStackData {
@@ -26,6 +30,8 @@ interface IStackData {
   mtGpt35: string;
   mtGpt40: string;
   mtKeti0: string;
+  mtGpt4o: string;
+  mtGoogle: string;
 }
 export default function Home() {
   const [sourceText, setSourceText] = useState('');
@@ -40,6 +46,8 @@ export default function Home() {
     mtGpt35: false,
     mtGpt40: false,
     mtKeti0: false,
+    mtGpt4o: false,
+    mtGoogle: false,
   });
 
   const {
@@ -65,10 +73,21 @@ export default function Home() {
     refetch: refetchGpt40,
   } = useMtGpt40(sourceText);
   const {
+    data: mtGpt4o,
+    isFetching: isFetchingGpt4o,
+    refetch: refetchGpt4o,
+  } = useMtGpt4o(sourceText);
+  const {
     data: mtKeti0,
     isFetching: isFetchingKeti0,
     refetch: refetchKeti0,
   } = useMtKeti(sourceText);
+  const {
+    data: mtGoogle,
+    isFetching: isFetchingGoogle,
+    refetch: refetchGoogle,
+  } = useMtGoogle(sourceText);
+  console.log('mtGoogle', mtGoogle);
 
   useEffect(() => {
     const isAnyTrue = Object.values(turnOn).some((value) => value);
@@ -91,8 +110,14 @@ export default function Home() {
     if (turnOn.mtGpt40) {
       refetchGpt40();
     }
+    if (turnOn.mtGpt4o) {
+      refetchGpt4o();
+    }
     if (turnOn.mtKeti0) {
       refetchKeti0();
+    }
+    if (turnOn.mtGoogle) {
+      refetchGoogle();
     }
   };
 
@@ -120,6 +145,8 @@ export default function Home() {
         mtGpt40,
         mtPapago,
         mtKeti0,
+        mtGpt4o,
+        mtGoogle,
       });
 
       return newStackData;
@@ -147,8 +174,8 @@ export default function Home() {
   }
 
   return (
-    <div className='space-y-10 divide-y-2 p-2 '>
-      <section>
+    <div className='space-y-10 divide-y-2 p-2'>
+      <section className='w-full max-w-6xl mx-auto flex justify-center'>
         <FormGroup sx={{ px: 5, flexDirection: 'row', gap: 5 }}>
           <FormControlLabel
             control={
@@ -199,25 +226,47 @@ export default function Home() {
               <Switch
                 size='small'
                 onClick={() =>
+                  setTurnOn((prev) => ({ ...prev, mtGpt4o: !prev.mtGpt4o }))
+                }
+              />
+            }
+            label='GPT 4o'
+          />
+          <FormControlLabel
+            control={
+              <Switch
+                size='small'
+                onClick={() =>
                   setTurnOn((prev) => ({ ...prev, mtKeti0: !prev.mtKeti0 }))
                 }
               />
             }
             label='Keti-0'
           />
+          <FormControlLabel
+            control={
+              <Switch
+                size='small'
+                onClick={() =>
+                  setTurnOn((prev) => ({ ...prev, mtGoogle: !prev.mtGoogle }))
+                }
+              />
+            }
+            label='Google'
+          />
         </FormGroup>
       </section>
       {/* <section className='border flex flex-col gap-3'></section> */}
-      <div className='flex'>
-        <section className='flex flex-col max-w-sm'>
+      <div className='flex w-full max-w-6xl mx-auto justify-center'>
+        <section className='flex flex-col w-1/2'>
           <h3 className='font-semibold text-cyan-800'>English</h3>
           <textarea
-            className='border'
+            className='border h-[200px]'
             value={sourceText}
             onChange={(event) => setSourceText(event.target.value)}
           />
           <button
-            className={`${
+            className={`h-[30px] ${
               isTranslateButtonActive
                 ? 'bg-red-400 text-white'
                 : 'bg-gray-100 text-gray-300 cursor-not-allowed'
@@ -226,66 +275,85 @@ export default function Home() {
             번역하기
           </button>
         </section>
-        <section>
+        <section className='flex flex-col w-1/2'>
           <h3 className='font-semibold text-cyan-800'>인간 번역</h3>
           <textarea
-            className='border'
+            className='border h-[200px]'
             value={humanTranslation}
             onChange={(event) => setHumanTranslation(event.target.value)}
           />
           <button
             disabled
-            className='border p-1 rounded text-gray-400 cursor-not-allowed'
+            className='h-[30px] border p-1 rounded text-gray-400 cursor-not-allowed'
             onClick={onEvaluation}>
             평가하기
           </button>
         </section>
       </div>
-
-      <section className='flex flex-col gap-3'>
+      {/* 번역기 */}
+      <section className='grid grid-cols-3 gap-3 w-full max-w-6xl mx-auto'>
         <TranslatorBlock
           title='Papago'
           text={mtPapago}
           isLoading={isFetchingPapago}
+          isTurnOn={turnOn.mtPapago}
         />
 
         <TranslatorBlock
           title='DeepL'
           text={mtDeepl}
           isLoading={isFetchingDeepl}
+          isTurnOn={turnOn.mtDeepl}
         />
         <TranslatorBlock
           title='GPT 3.5(turbo-1106, 16k tokens)'
           text={mtGpt35}
           isLoading={isFetchingGpt35}
+          isTurnOn={turnOn.mtGpt35}
         />
         <TranslatorBlock
           title='GPT 4.0(0613, 8k tokens)'
           text={mtGpt40}
           isLoading={isFetchingGpt40}
+          isTurnOn={turnOn.mtGpt40}
+        />
+        <TranslatorBlock
+          title='GPT 4o(128k tokens)'
+          text={mtGpt4o}
+          isLoading={isFetchingGpt4o}
+          isTurnOn={turnOn.mtGpt4o}
         />
         <TranslatorBlock
           title='keti-0'
           text={mtKeti0}
           isLoading={isFetchingKeti0}
+          isTurnOn={turnOn.mtKeti0}
+        />
+        <TranslatorBlock
+          title='google'
+          text={mtGoogle}
+          isLoading={isFetchingGoogle}
+          isTurnOn={turnOn.mtGoogle}
         />
       </section>
-
-      <button
-        className='border bg-orange-400 text-white p-3 rounded hover:opacity-50 active:scale-90 transition-all'
-        onClick={onCopy}>
-        Copy
-      </button>
-      <button
-        className='border bg-orange-400 text-white p-3 rounded hover:opacity-50 active:scale-90 transition-all'
-        onClick={onStack}>
-        Stack
-      </button>
-      <button
-        className='border bg-orange-400 text-white p-3 rounded hover:opacity-50 active:scale-90 transition-all'
-        onClick={() => downloadCSV(stackData)}>
-        Download(.csv)
-      </button>
+      {/* 버튼 */}
+      <div className='flex w-full max-w-6xl mx-auto'>
+        <button
+          className='border bg-orange-400 text-white p-3 rounded hover:opacity-50 active:scale-90 transition-all'
+          onClick={onCopy}>
+          Copy
+        </button>
+        <button
+          className='border bg-orange-400 text-white p-3 rounded hover:opacity-50 active:scale-90 transition-all'
+          onClick={onStack}>
+          Stack
+        </button>
+        <button
+          className='border bg-orange-400 text-white p-3 rounded hover:opacity-50 active:scale-90 transition-all'
+          onClick={() => downloadCSV(stackData)}>
+          Download(.csv)
+        </button>
+      </div>
       <pre>{JSON.stringify(stackData, null, 2)}</pre>
     </div>
   );

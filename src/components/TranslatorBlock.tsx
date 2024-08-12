@@ -5,9 +5,15 @@ type Props = {
   title: string;
   text: string;
   isLoading: boolean;
+  isTurnOn: boolean;
 };
 
-export default function TranslatorBlock({ title, text, isLoading }: Props) {
+export default function TranslatorBlock({
+  title,
+  text,
+  isLoading,
+  isTurnOn,
+}: Props) {
   const [open, setOpen] = React.useState(false);
 
   const handleClick = () => {
@@ -22,7 +28,6 @@ export default function TranslatorBlock({ title, text, isLoading }: Props) {
     if (reason === 'clickaway') {
       return;
     }
-
     setOpen(false);
   };
 
@@ -38,9 +43,10 @@ export default function TranslatorBlock({ title, text, isLoading }: Props) {
         console.error('Failed to copy text: ', err);
       });
   };
+  if (!isTurnOn) return null;
 
   return (
-    <section className='flex flex-col max-w-sm py-2 px-4 rounded shadow-lg'>
+    <section className='flex flex-col w-full py-2 px-4 rounded shadow-lg'>
       <h3 className='font-semibold text-sky-500 mb-3'>{title}</h3>
       <p className='p-1 bg-blue-50 text-blue-900'>
         {isLoading ? '로딩중...' : text ? text : 'null'}

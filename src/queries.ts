@@ -81,6 +81,15 @@ export const useMtGpt40 = (sourceText: string) => {
   });
 };
 
+export const useMtGpt4o = (sourceText: string) => {
+  return useQuery({
+    queryKey: ['gpt-4o'],
+    queryFn: () => postGpt({ sourceText, model: 'gpt-4o' }),
+    select: (res) => res.data.text,
+    enabled: false,
+  });
+};
+
 export const useMtKeti = (sourceText: string) => {
   return useQuery({
     queryKey: ['mtKeti-0'],
@@ -89,6 +98,20 @@ export const useMtKeti = (sourceText: string) => {
         sourceText,
       }),
     select: (res) => res.data,
+    enabled: false,
+  });
+};
+
+export const useMtGoogle = (sourceText: string) => {
+  return useQuery({
+    queryKey: ['mtGoogle'],
+    queryFn: () =>
+      axios.post('/api/google', {
+        sourceText,
+      }),
+    select: (res) => {
+      return res.data.text;
+    },
     enabled: false,
   });
 };
