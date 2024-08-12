@@ -34,11 +34,12 @@ export async function POST(request: Request) {
           messages: [
             {
               role: 'system',
-              content: `You are a translation engine that translates English into Korean. Please output a Korean sentence for the input English sentence.`,
+              content: `You are an advanced translation engine that accurately translates English text into fluent and contextually appropriate Korean. Translate the following English text into Korean, considering the context and nuances of both languages.
+`,
             },
             {
               role: 'user',
-              content: `${sourceText}`,
+              content: `English: ${sourceText} \n Korean: `,
             },
           ],
           temperature: 1,

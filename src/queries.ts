@@ -115,3 +115,32 @@ export const useMtGoogle = (sourceText: string) => {
     enabled: false,
   });
 };
+
+export const useMtGeminiFlash = (sourceText: string) => {
+  return useQuery({
+    queryKey: ['mtGeminiFlash'],
+    queryFn: () =>
+      axios.post('/api/gemini', {
+        sourceText,
+        modelVersion: 'gemini-1.5-flash',
+      }),
+    select: (res) => {
+      return res.data.text;
+    },
+    enabled: false,
+  });
+};
+export const useMtGeminiPro15 = (sourceText: string) => {
+  return useQuery({
+    queryKey: ['mtGeminiPro'],
+    queryFn: () =>
+      axios.post('/api/gemini', {
+        sourceText,
+        modelVersion: 'gemini-1.5-pro',
+      }),
+    select: (res) => {
+      return res.data.text;
+    },
+    enabled: false,
+  });
+};

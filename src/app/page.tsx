@@ -1,7 +1,11 @@
 'use client';
+import { chatGPTPrompt, geminiPrompt } from '@/app/lib/prompts';
+import ModelToggle from '@/components/ModelToggle';
 import TranslatorBlock from '@/components/TranslatorBlock';
 import {
   useMtDeepl,
+  useMtGeminiFlash,
+  useMtGeminiPro15,
   useMtGoogle,
   useMtGpt35_1106,
   useMtGpt40,
@@ -9,7 +13,7 @@ import {
   useMtKeti,
   useMtPapago,
 } from '@/queries';
-import { FormControlLabel, FormGroup, Switch } from '@mui/material';
+import { FormControlLabel, FormGroup, Switch, Tooltip } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 interface ITurnOn {
@@ -20,6 +24,8 @@ interface ITurnOn {
   mtKeti0: boolean;
   mtGpt4o: boolean;
   mtGoogle: boolean;
+  mtGeminiFlash: boolean;
+  mtGeminiPro15: boolean;
 }
 
 interface IStackData {
@@ -32,6 +38,8 @@ interface IStackData {
   mtKeti0: string;
   mtGpt4o: string;
   mtGoogle: string;
+  mtGeminiFlash: string;
+  mtGeminiPro15: string;
 }
 export default function Home() {
   const [sourceText, setSourceText] = useState('');
@@ -48,6 +56,8 @@ export default function Home() {
     mtKeti0: false,
     mtGpt4o: false,
     mtGoogle: false,
+    mtGeminiFlash: false,
+    mtGeminiPro15: false,
   });
 
   const {
@@ -87,7 +97,16 @@ export default function Home() {
     isFetching: isFetchingGoogle,
     refetch: refetchGoogle,
   } = useMtGoogle(sourceText);
-  console.log('mtGoogle', mtGoogle);
+  const {
+    data: mtGeminiFlash,
+    isFetching: isFetchingGeminiFlash,
+    refetch: refetchGeminiFlash,
+  } = useMtGeminiFlash(sourceText);
+  const {
+    data: mtGeminiPro15,
+    isFetching: isFetchingGeminiPro15,
+    refetch: refetchGeminiPro15,
+  } = useMtGeminiPro15(sourceText);
 
   useEffect(() => {
     const isAnyTrue = Object.values(turnOn).some((value) => value);
@@ -119,6 +138,12 @@ export default function Home() {
     if (turnOn.mtGoogle) {
       refetchGoogle();
     }
+    if (turnOn.mtGeminiFlash) {
+      refetchGeminiFlash();
+    }
+    if (turnOn.mtGeminiPro15) {
+      refetchGeminiPro15();
+    }
   };
 
   function onCopy() {
@@ -147,6 +172,8 @@ export default function Home() {
         mtKeti0,
         mtGpt4o,
         mtGoogle,
+        mtGeminiFlash,
+        mtGeminiPro15,
       });
 
       return newStackData;
@@ -177,82 +204,71 @@ export default function Home() {
     <div className='space-y-10 divide-y-2 p-2'>
       <section className='w-full max-w-6xl mx-auto flex justify-center'>
         <FormGroup sx={{ px: 5, flexDirection: 'row', gap: 5 }}>
-          <FormControlLabel
-            control={
-              <Switch
-                size='small'
-                onClick={() =>
-                  setTurnOn((prev) => ({ ...prev, mtPapago: !prev.mtPapago }))
-                }
-              />
-            }
+          <ModelToggle
             label='Papago'
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                size='small'
-                onClick={() =>
-                  setTurnOn((prev) => ({ ...prev, mtDeepl: !prev.mtDeepl }))
-                }
-              />
+            onClick={() =>
+              setTurnOn((prev) => ({ ...prev, mtPapago: !prev.mtPapago }))
             }
-            label='Deepl'
           />
-          <FormControlLabel
-            control={
-              <Switch
-                size='small'
-                onClick={() =>
-                  setTurnOn((prev) => ({ ...prev, mtGpt35: !prev.mtGpt35 }))
-                }
-              />
+          <ModelToggle
+            label='DeepL'
+            onClick={() =>
+              setTurnOn((prev) => ({ ...prev, mtDeepl: !prev.mtDeepl }))
             }
+          />
+          <ModelToggle
             label='GPT 3.5-turbo'
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                size='small'
-                onClick={() =>
-                  setTurnOn((prev) => ({ ...prev, mtGpt40: !prev.mtGpt40 }))
-                }
-              />
+            onClick={() =>
+              setTurnOn((prev) => ({ ...prev, mtGpt35: !prev.mtGpt35 }))
             }
+            tooltipTitle={chatGPTPrompt}
+          />
+          <ModelToggle
             label='GPT 4.0'
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                size='small'
-                onClick={() =>
-                  setTurnOn((prev) => ({ ...prev, mtGpt4o: !prev.mtGpt4o }))
-                }
-              />
+            onClick={() =>
+              setTurnOn((prev) => ({ ...prev, mtGpt40: !prev.mtGpt40 }))
             }
+            tooltipTitle={chatGPTPrompt}
+          />
+          <ModelToggle
             label='GPT 4o'
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                size='small'
-                onClick={() =>
-                  setTurnOn((prev) => ({ ...prev, mtKeti0: !prev.mtKeti0 }))
-                }
-              />
+            onClick={() =>
+              setTurnOn((prev) => ({ ...prev, mtGpt4o: !prev.mtGpt4o }))
             }
+            tooltipTitle={chatGPTPrompt}
+          />
+          <ModelToggle
             label='Keti-0'
-          />
-          <FormControlLabel
-            control={
-              <Switch
-                size='small'
-                onClick={() =>
-                  setTurnOn((prev) => ({ ...prev, mtGoogle: !prev.mtGoogle }))
-                }
-              />
+            onClick={() =>
+              setTurnOn((prev) => ({ ...prev, mtKeti0: !prev.mtKeti0 }))
             }
-            label='Google'
+            disabled
+          />
+          <ModelToggle
+            label='Google(v2)'
+            onClick={() =>
+              setTurnOn((prev) => ({ ...prev, mtGoogle: !prev.mtGoogle }))
+            }
+          />
+          <ModelToggle
+            label='Gemini(flash)'
+            onClick={() =>
+              setTurnOn((prev) => ({
+                ...prev,
+                mtGeminiFlash: !prev.mtGeminiFlash,
+              }))
+            }
+            tooltipTitle={geminiPrompt}
+          />
+          <ModelToggle
+            label='Gemini(pro1.5)'
+            onClick={() =>
+              setTurnOn((prev) => ({
+                ...prev,
+                mtGeminiPro15: !prev.mtGeminiPro15,
+              }))
+            }
+            tooltipTitle={geminiPrompt}
           />
         </FormGroup>
       </section>
@@ -330,10 +346,22 @@ export default function Home() {
           isTurnOn={turnOn.mtKeti0}
         />
         <TranslatorBlock
-          title='google'
+          title='google(v2)'
           text={mtGoogle}
           isLoading={isFetchingGoogle}
           isTurnOn={turnOn.mtGoogle}
+        />
+        <TranslatorBlock
+          title='gemini(flash, 1M tokens)'
+          text={mtGeminiFlash}
+          isLoading={isFetchingGeminiFlash}
+          isTurnOn={turnOn.mtGeminiFlash}
+        />
+        <TranslatorBlock
+          title='gemini(pro1.5, 2M tokens)'
+          text={mtGeminiPro15}
+          isLoading={isFetchingGeminiPro15}
+          isTurnOn={turnOn.mtGeminiPro15}
         />
       </section>
       {/* 버튼 */}
