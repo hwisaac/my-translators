@@ -204,12 +204,12 @@ export default function Home() {
     <div className='space-y-10 divide-y-2 p-2'>
       <section className='w-full max-w-6xl mx-auto flex justify-center'>
         <FormGroup sx={{ px: 5, flexDirection: 'row', gap: 5 }}>
-          <ModelToggle
+          {/* <ModelToggle
             label='Papago'
             onClick={() =>
               setTurnOn((prev) => ({ ...prev, mtPapago: !prev.mtPapago }))
             }
-          />
+          /> */}
           <ModelToggle
             label='DeepL'
             onClick={() =>
